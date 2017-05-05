@@ -1,0 +1,8 @@
+server:
+  port: 8089
+  context-path: /ysynzehao
+
+user-info:
+  name: admin
+  age: 30
+  desc: "name: ${user-info.name}, age: ${user-info.age}"
