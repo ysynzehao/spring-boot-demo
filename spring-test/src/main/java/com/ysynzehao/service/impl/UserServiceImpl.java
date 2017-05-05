@@ -4,6 +4,7 @@ import com.ysynzehao.dao.UserRepository;
 import com.ysynzehao.entry.User;
 import com.ysynzehao.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Cacheable(value = "usercache",keyGenerator = "wiselyKeyGenerator")
     @Override
     public List<User> getUserList() {
         return userRepository.findAll();
