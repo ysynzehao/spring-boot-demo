@@ -7,9 +7,11 @@ import java.util.List;
  */
 public interface JRedisService {
 
-    public boolean set(String key, String value);
+    public boolean set(String key, Object value);
 
     public String get(String key);
+
+    public <T> T get(String key, Class<T> clz);
 
     public boolean expire(String key,long expire);
 

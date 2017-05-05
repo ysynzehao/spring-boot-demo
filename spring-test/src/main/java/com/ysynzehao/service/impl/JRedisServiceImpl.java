@@ -22,7 +22,6 @@ public class JRedisServiceImpl implements JRedisService{
     @Autowired
     private RedisTemplate<String, ?> redisTemplate;
 
-    @Override
     public boolean set(final String key, final String value) {
         boolean result = redisTemplate.execute(new RedisCallback<Boolean>() {
             @Override
@@ -35,6 +34,17 @@ public class JRedisServiceImpl implements JRedisService{
         return result;
     }
 
+    @Override
+    public boolean set(String key, Object value) {
+        if (value instanceof String) {
+            set(key, (String) value);
+        } else {
+            final String json = JSONUtil.toJson(value);
+            set(key, json);
+        }
+        return false;
+    }
+
     public String get(final String key){
         String result = redisTemplate.execute(new RedisCallback<String>() {
             @Override
@@ -45,6 +55,12 @@ public class JRedisServiceImpl implements JRedisService{
             }
         });
         return result;
+    }
+
+    @Override
+    public <T> T get(String key, Class<T> clz) {
+        String result = get(key);
+        return JSONUtil.toBean(result, clz);
     }
 
     @Override
