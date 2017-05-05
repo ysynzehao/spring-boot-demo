@@ -21,6 +21,7 @@ public class UserServiceImpl implements UserService {
     @Cacheable(value = "usercache",keyGenerator = "wiselyKeyGenerator")
     @Override
     public List<User> getUserList() {
+        System.out.println("--------------------------------------");
         return userRepository.findAll();
     }
 
