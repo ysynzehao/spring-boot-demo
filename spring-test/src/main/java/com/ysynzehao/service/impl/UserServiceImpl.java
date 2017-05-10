@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private JRedisService jRedisService;
 
-    @Cacheable(value = "usercache",keyGenerator = "wiselyKeyGenerator")
+    //@Cacheable(value = "usercache",keyGenerator = "wiselyKeyGenerator")
     @Override
     public List<User> getUserList() {
         return userRepository.findAll();

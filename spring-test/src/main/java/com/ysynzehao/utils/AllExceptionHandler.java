@@ -14,6 +14,7 @@ public class AllExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
     public Result handleException(Exception e) {
+        e.printStackTrace();
         return ResultUtils.getResult(StatusCode.Exception, e.getMessage());
     }
 }

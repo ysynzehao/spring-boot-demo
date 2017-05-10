@@ -5,8 +5,10 @@ import com.ysynzehao.utils.JSONUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Service;
 
@@ -22,12 +24,14 @@ public class JRedisServiceImpl implements JRedisService{
     @Autowired
     private RedisTemplate<String, ?> redisTemplate;
 
-    public boolean set(final String key, final String value) {
+    public boolean set(final String key, final String value, final long expire) {
         boolean result = redisTemplate.execute(new RedisCallback<Boolean>() {
             @Override
             public Boolean doInRedis(RedisConnection connection) throws DataAccessException {
                 RedisSerializer<String> serializer = redisTemplate.getStringSerializer();
-                connection.set(serializer.serialize(key), serializer.serialize(value));
+                //connection.set(serializer.serialize(key), serializer.serialize(value));
+                Expiration expiration = Expiration.from(expire, TimeUnit.SECONDS);
+                connection.set(serializer.serialize(key), serializer.serialize(value), expiration, RedisStringCommands.SetOption.SET_IF_ABSENT);
                 return true;
             }
         });
@@ -36,12 +40,20 @@ public class JRedisServiceImpl implements JRedisService{
 
     @Override
     public boolean set(String key, Object value) {
+        final StringBuffer v = new StringBuffer();
         if (value instanceof String) {
-            set(key, (String) value);
+            v.append((String) value);
         } else {
-            final String json = JSONUtil.toJson(value);
-            set(key, json);
+            v.append(JSONUtil.toJson(value));
         }
+        boolean result = redisTemplate.execute(new RedisCallback<Boolean>() {
+            @Override
+            public Boolean doInRedis(RedisConnection connection) throws DataAccessException {
+                RedisSerializer<String> serializer = redisTemplate.getStringSerializer();
+                connection.set(serializer.serialize(key), serializer.serialize(v.toString()));
+                return true;
+            }
+        });
         return false;
     }
 
