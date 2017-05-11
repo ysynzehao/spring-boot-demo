@@ -24,14 +24,21 @@ public class JRedisServiceImpl implements JRedisService{
     @Autowired
     private RedisTemplate<String, ?> redisTemplate;
 
-    public boolean set(final String key, final String value, final long expire) {
+    @Override
+    public boolean set(final String key, final Object value, final long expire) {
+    	final StringBuffer v = new StringBuffer();
+        if (value instanceof String) {
+            v.append((String) value);
+        } else {
+            v.append(JSONUtil.toJson(value));
+        }
         boolean result = redisTemplate.execute(new RedisCallback<Boolean>() {
             @Override
             public Boolean doInRedis(RedisConnection connection) throws DataAccessException {
                 RedisSerializer<String> serializer = redisTemplate.getStringSerializer();
                 //connection.set(serializer.serialize(key), serializer.serialize(value));
                 Expiration expiration = Expiration.from(expire, TimeUnit.SECONDS);
-                connection.set(serializer.serialize(key), serializer.serialize(value), expiration, RedisStringCommands.SetOption.SET_IF_ABSENT);
+                connection.set(serializer.serialize(key), serializer.serialize(v.toString()), expiration, RedisStringCommands.SetOption.SET_IF_ABSENT);
                 return true;
             }
         });

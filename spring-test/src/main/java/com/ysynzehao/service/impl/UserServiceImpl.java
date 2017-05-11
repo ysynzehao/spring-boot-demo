@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             System.out.println("--------------------------------------");
             user = userRepository.findOne(id);
-            jRedisService.set("user" + id, user);
+            jRedisService.set("user" + id, user, 10);
         }
         return user;
     }
